@@ -2,7 +2,31 @@ const MESSENGER_URL="https://m.me/61590839113495";
 const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 const money=v=>"৳"+Number(v||0).toLocaleString("en-BD",{maximumFractionDigits:0});
 const imageUrl=p=>p.image_url||"/assets/images/logo.png";
-const orderUrl=n=>MESSENGER_URL+"?ref="+encodeURIComponent("Order: "+n);
+const orderMessage=p=>`🛍️ LUMINESSE BEAUTY ORDER
+
+Product: ${p.name}
+Price: ${money(p.price)}
+Product ID: ${p.slug||p.id||"N/A"}
+
+আমি এই পণ্যটি অর্ডার করতে চাই।
+Please confirm my order.`;
+
+function orderProduct(p){
+  const message=orderMessage(p);
+
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(message).then(()=>{
+      alert("Order information copied!\\n\\nMessenger খুলবে। সেখানে Paste করে Send করুন।");
+      window.open(MESSENGER_URL,"_blank","noopener");
+    }).catch(()=>{
+      window.open(MESSENGER_URL,"_blank","noopener");
+      alert(message);
+    });
+  }else{
+    window.open(MESSENGER_URL,"_blank","noopener");
+    alert(message);
+  }
+}
 function header(){document.getElementById("site-header").innerHTML=`<header class="site-header"><div class="container nav-wrap"><a class="brand" href="/"><img src="/assets/images/logo.png" alt="Luminesse Beauty"><span><strong>Luminesse</strong><small>BEAUTY</small></span></a><nav class="nav"><a href="/">হোম</a><a href="/shop.html">শপ</a><a href="/shop.html?category=skincare">স্কিনকেয়ার</a><a href="/shop.html?category=lipsticks">লিপস্টিক</a><a class="nav-cta" href="${MESSENGER_URL}" target="_blank" rel="noopener">মেসেঞ্জারে অর্ডার</a></nav><button class="menu-toggle" aria-label="মেনু খুলুন">☰</button></div></header>`;document.querySelector(".menu-toggle")?.addEventListener("click",()=>document.querySelector(".nav").classList.toggle("open"))}
 function footer(){document.getElementById("site-footer").innerHTML=`<footer class="footer"><div class="container footer-grid"><div><div class="brand"><img src="/assets/images/logo.png" alt="Luminesse Beauty"><span><strong>Luminesse</strong><small>BEAUTY</small></span></div><p class="muted">সাশ্রয়ী cosmetics, skincare ও beauty essentials—আপনার নিজের সৌন্দর্য, আপনার নিজের স্টাইলে।</p></div><div><h3>ক্যাটাগরি</h3><a href="/shop.html">সব পণ্য</a><a href="/shop.html?category=skincare">স্কিনকেয়ার</a><a href="/shop.html?category=lipsticks">লিপস্টিক</a></div><div><h3>যোগাযোগ</h3><a href="https://www.facebook.com/people/Luminesse-Beauty/61590839113495/" target="_blank" rel="noopener">Facebook</a><a href="${MESSENGER_URL}" target="_blank" rel="noopener">Messenger</a><a href="/admin/">Admin</a></div></div><div class="container footer-bottom"><span>© ${new Date().getFullYear()} Luminesse Beauty</span><span>Making Beauty personal • সৌন্দর্য হোক আপনার মতো</span></div></footer>`}
 function card(p){return `<article class="product-card"><a class="product-image" href="/product.html?slug=${encodeURIComponent(p.slug)}"><img loading="lazy" decoding="async" src="${esc(imageUrl(p))}" alt="${esc(p.name)}" width="600" height="600">${p.is_featured?'<span class="pill">Featured</span>':''}</a><div class="product-info"><small>${esc(p.category)}</small><h3><a href="/product.html?slug=${encodeURIComponent(p.slug)}">${esc(p.name)}</a></h3><div class="price-row"><strong>${money(p.price)}</strong><a class="mini-order" target="_blank" rel="noopener" href="${esc(orderUrl(p.name))}">অর্ডার →</a></div></div></article>`}
